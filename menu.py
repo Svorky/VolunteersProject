@@ -33,7 +33,7 @@ def add_volunteer() -> dict:
 
 def show_all() -> list:
     result = select("select * from volunteer")
-    print(result)
+    pretty_print(result)
 
 def find() -> Volunteer:
     print("Find by: ")
@@ -51,7 +51,22 @@ def update():
     vol = input("Type a name of volunteer to update")
 
 def delete():
-    vol = input("Type a name of volunteer to delete")
+    user = input('''Do you want to choose a volunteer or delete by name:
+                 1. Choose
+                 2. I know name
+                 ''').strip()
+    if int(user) == 1:
+        query = 'select id, name from volunteer'
+        result = select(query)
+        for row in result:
+            print(f"{row['id']}. {row['name']}")
+    else:
+        name = "%"
+        name += input("Type a name: ").strip()
+        query = "select id from volunteer where name ilike %s"
+        name += "%"
+        result = select(query, [name])
+        pretty_print(result)
 
 def car_question():
     car = input("Have a car (Y/N): ").strip().lower()
@@ -123,3 +138,7 @@ def city_question():
         city = City(v_city)
         id = city.add()
         return id
+    
+def pretty_print(data) -> None:
+    for row in data:
+        print(dict(row))
