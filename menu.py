@@ -1,7 +1,8 @@
 # import VolunteersManager
 from volunteer import Volunteer
 from city import City
-# import Car
+from car import Car
+from volunteer_car import VolunteerCar
 # import Bussiness
 # import Animal
 from language import Language
@@ -12,20 +13,23 @@ def add_volunteer() -> int:
     print("You choose to add a new volunteer.")
     print("Please, type the following attributes.")
     print("If you don't want to fill some information leave a space (press Enter)")
+    car = Car()
     volunteer = {
         'name': input("Name: ").strip(),
         'birth_date': input("Birth date (dd/mm/yyyy): ").strip(),
         'telephone': input("Telephone: ").strip(),
         'city_id': city_question(),
         'language': language_question(),
-        'has_driver_licence': input("Have a driving licence (Y/N): ").strip(),
-        # 'car': car_question(),
+        'has_driver_licence': car.driver_licence_question(),
+        'has_car': car.car_question(),
         # 'has_bussiness': bussiness_question(),
         # "love_animals": animal_question()
     }
     v = Volunteer(volunteer)
     id = v.create()
     VolunteerLanguage.create(id, volunteer['language'])
+    if car.id:
+        VolunteerCar.create(id, car.id)
 
 def show_all() -> None:
     result = Volunteer.get_all()
@@ -73,21 +77,6 @@ def delete():
         v_result[int(id)-1].delete()
         print(f"{v_result[int(id)-1].name} was removed.")
         input("Press Enter...")
-
-def car_question():
-    car = input("Have a car (Y/N): ").strip().lower()
-    if car == 'y':
-        print("Which car do you have:")
-        Car.get_all()
-        v_car = input("Choose a car or type a new one: ").strip()
-        if v_car.isdigit():
-            pass
-        else:
-            Car.add()
-    return {
-        "has_car": car,
-        "car": v_car
-    }
     
 def bussiness_question():
     buss = input("Have a bussiness (Y/N): ").strip().lower()
