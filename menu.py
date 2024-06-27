@@ -4,35 +4,31 @@ from city import City
 # import Car
 # import Bussiness
 # import Animal
-# import Language
+from language import Language
+from volunteer_language import VolunteerLanguage
 from database import select, insert
 
-def add_volunteer() -> dict:
+def add_volunteer() -> int:
     print("You choose to add a new volunteer.")
     print("Please, type the following attributes.")
     print("If you don't want to fill some information leave a space (press Enter)")
-    # v_name = input("Name: ").strip()
-    # v_birth = input("Birth date (dd/mm/yyyy): ").strip()
-    # v_city = input("City: ").strip()
     volunteer = {
         'name': input("Name: ").strip(),
         'birth_date': input("Birth date (dd/mm/yyyy): ").strip(),
         'telephone': input("Telephone: ").strip(),
         'city_id': city_question(),
-        # 'language': language_question(),
+        'language': language_question(),
         'has_driver_licence': input("Have a driving licence (Y/N): ").strip(),
         # 'car': car_question(),
         # 'has_bussiness': bussiness_question(),
         # "love_animals": animal_question()
     }
-    query = f'''insert into volunteer ({", ".join(list(volunteer.keys()))})
-    values
-    ({", ".join(["%s" for _ in volunteer.keys()])})'''
-    insert(query, list(volunteer.values()))
-    return volunteer
+    v = Volunteer(volunteer)
+    id = v.create()
+    VolunteerLanguage.create(id, volunteer['language'])
 
-def show_all() -> list:
-    result = select("select * from volunteer")
+def show_all() -> None:
+    result = Volunteer.get_all()
     pretty_print(result)
 
 def find() -> Volunteer:
@@ -56,17 +52,27 @@ def delete():
                  2. I know name
                  ''').strip()
     if int(user) == 1:
-        query = 'select id, name from volunteer'
-        result = select(query)
-        for row in result:
-            print(f"{row['id']}. {row['name']}")
+        result = Volunteer.get_all()
+        for idx, row in enumerate(result):
+            print(f"{idx+1}. {row.name}")
+        id = input("Type number: ").strip()
+        result[int(id)-1].delete()
+        print(f"{result[int(id)-1].name} was removed.")
+        input("Press Enter...")
     else:
         name = "%"
         name += input("Type a name: ").strip()
-        query = "select id from volunteer where name ilike %s"
+        query = "select id, name from volunteer where name ilike %s"
         name += "%"
         result = select(query, [name])
-        pretty_print(result)
+        v_result = Volunteer.convert_to_self(result)
+        pretty_print(v_result)
+        for idx, row in enumerate(v_result):
+            print(f"{idx+1}. {row.name}")
+        id = input("Type number: ").strip()
+        v_result[int(id)-1].delete()
+        print(f"{v_result[int(id)-1].name} was removed.")
+        input("Press Enter...")
 
 def car_question():
     car = input("Have a car (Y/N): ").strip().lower()
@@ -114,26 +120,28 @@ def animal_question():
     }
     
 def language_question():
-    print("Which languages do you love:")
-    Language.get_all()
+    print("Which languages do you speak:")
+    languages = Language.get_all()
+    for [idx,row] in enumerate(languages):
+        s = f"{idx+1}. {row["name"]}"
+        print(s)
     v_language = input("Choose an language or type a new one: ").strip()
     if v_language.isdigit():
-        pass
+        return languages[int(v_language)-1]['id']
     else:
-        Language.add()
-    return {
-        "language": v_language
-    }
+        language = Language(v_language)
+        id = language.add()
+        return id
     
 def city_question():
     cities = City.get_all()
     print("Cities: ")
-    for row in cities:
-        s = f"{row['id']}. {row["name"]}"
+    for [idx,row] in enumerate(cities):
+        s = f"{idx+1}. {row["name"]}"
         print(s)
     v_city = input("Choose city or write a new one: ").strip()
     if v_city.isdigit():
-        return int(v_city)
+        return cities[int(v_city)-1]['id']
     else:
         city = City(v_city)
         id = city.add()
@@ -141,4 +149,4 @@ def city_question():
     
 def pretty_print(data) -> None:
     for row in data:
-        print(dict(row))
+        print(row)
