@@ -36,10 +36,11 @@ class Volunteer:
 
     def create(self) -> int:
         volunteer = self.__dict__
-        keys = list(volunteer.keys())
-        keys.remove('id')
+        # keys = list(volunteer.keys())
+        # keys.remove('id')
+        del volunteer['id']
         query = f'''
-            insert into volunteer ({", ".join(keys)})
+            insert into volunteer ({", ".join(list(volunteer.keys()))})
             values
             ({", ".join(["%s" for _ in volunteer.keys()])})
             '''

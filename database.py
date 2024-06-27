@@ -29,8 +29,9 @@ def select(query, params=[]) -> list[psycopg2.extras.RealDictRow]:
 
     return result
 
-def insert(query, params) -> int | None:
-    query = query + " RETURNING id;"
+def insert(query, params, return_id = True) -> int | None:
+    if return_id:
+        query = query + " RETURNING id;"
     id = None
     with psycopg2.connect(
         dbname=DBNAME, user=USER, password=PASSWORD, host=HOST, port=PORT
@@ -45,7 +46,8 @@ def insert(query, params) -> int | None:
 
         connection.commit()
         
-        id = cursor.fetchone()[0]
+        if return_id:
+            id = cursor.fetchone()[0]
     return id
 
 def delete(query, params):
