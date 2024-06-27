@@ -5,13 +5,13 @@ class City:
         self.name = name
     
     @classmethod
-    def get_all():
+    def get_all(self):
         query = "select id, name from city"
         result = select(query)
         return result
     
     def add(self):
-        query = 'insert into city (name) values (%s);'
+        query = 'insert into city (name) values (%s)'
         id = insert(query, [self.name])
         return id
     

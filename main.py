@@ -18,6 +18,7 @@ def menu():
                 add_volunteer()
             case 2:
                 show_all()
+                input("Press Enter...")
             case 3:
                 find()
             case 4:
