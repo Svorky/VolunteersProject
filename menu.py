@@ -1,9 +1,11 @@
-import VolunteersManager
+# import VolunteersManager
 from volunteer import Volunteer
-import Car
-import Bussiness
-import Animal
-import Language
+from city import City
+# import Car
+# import Bussiness
+# import Animal
+# import Language
+from database import select, insert
 
 def add_volunteer() -> dict:
     print("You choose to add a new volunteer.")
@@ -14,19 +16,24 @@ def add_volunteer() -> dict:
     # v_city = input("City: ").strip()
     volunteer = {
         'name': input("Name: ").strip(),
-        'birth': input("Birth date (dd/mm/yyyy): ").strip(),
+        'birth_date': input("Birth date (dd/mm/yyyy): ").strip(),
         'telephone': input("Telephone: ").strip(),
-        'city': input("City: ").strip(),
-        'language': language_question(),
-        'driving': input("Have a driving licence (Y/N): ").strip(),
-        'car': car_question(),
-        'has_bussiness': bussiness_question(),
-        "love_animals": animal_question()
+        'city_id': city_question(),
+        # 'language': language_question(),
+        'has_driver_licence': input("Have a driving licence (Y/N): ").strip(),
+        # 'car': car_question(),
+        # 'has_bussiness': bussiness_question(),
+        # "love_animals": animal_question()
     }
+    query = f'''insert into volunteer ({", ".join(list(volunteer.keys()))})
+    values
+    ({", ".join(["%s" for _ in volunteer.keys()])})'''
+    insert(query, list(volunteer.values()))
     return volunteer
 
 def show_all() -> list:
-    VolunteersManager.get_all()
+    result = select("select * from volunteer")
+    print(result)
 
 def find() -> Volunteer:
     print("Find by: ")
@@ -102,3 +109,17 @@ def language_question():
     return {
         "language": v_language
     }
+    
+def city_question():
+    cities = City.get_all()
+    print("Cities: ")
+    for row in cities:
+        s = f"{row['id']}. {row["name"]}"
+        print(s)
+    v_city = input("Choose city or write a new one: ").strip()
+    if v_city.isdigit():
+        return int(v_city)
+    else:
+        city = City(v_city)
+        id = city.add()
+        return id
