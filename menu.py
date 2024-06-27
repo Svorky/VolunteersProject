@@ -7,13 +7,10 @@ from city import City
 # import Language
 from database import select, insert
 
-def add_volunteer() -> dict:
+def add_volunteer() -> int:
     print("You choose to add a new volunteer.")
     print("Please, type the following attributes.")
     print("If you don't want to fill some information leave a space (press Enter)")
-    # v_name = input("Name: ").strip()
-    # v_birth = input("Birth date (dd/mm/yyyy): ").strip()
-    # v_city = input("City: ").strip()
     volunteer = {
         'name': input("Name: ").strip(),
         'birth_date': input("Birth date (dd/mm/yyyy): ").strip(),
@@ -25,14 +22,12 @@ def add_volunteer() -> dict:
         # 'has_bussiness': bussiness_question(),
         # "love_animals": animal_question()
     }
-    query = f'''insert into volunteer ({", ".join(list(volunteer.keys()))})
-    values
-    ({", ".join(["%s" for _ in volunteer.keys()])})'''
-    insert(query, list(volunteer.values()))
-    return volunteer
+    v = Volunteer(volunteer)
+    id = v.create()
+    return id
 
-def show_all() -> list:
-    result = select("select * from volunteer")
+def show_all() -> None:
+    result = Volunteer.get_all()
     pretty_print(result)
 
 def find() -> Volunteer:
@@ -56,17 +51,27 @@ def delete():
                  2. I know name
                  ''').strip()
     if int(user) == 1:
-        query = 'select id, name from volunteer'
-        result = select(query)
-        for row in result:
-            print(f"{row['id']}. {row['name']}")
+        result = Volunteer.get_all()
+        for idx, row in enumerate(result):
+            print(f"{idx+1}. {row.name}")
+        id = input("Type number: ").strip()
+        result[int(id)-1].delete()
+        print(f"{result[int(id)-1].name} was removed.")
+        input("Press Enter...")
     else:
         name = "%"
         name += input("Type a name: ").strip()
-        query = "select id from volunteer where name ilike %s"
+        query = "select id, name from volunteer where name ilike %s"
         name += "%"
         result = select(query, [name])
-        pretty_print(result)
+        v_result = Volunteer.convert_to_self(result)
+        pretty_print(v_result)
+        for idx, row in enumerate(v_result):
+            print(f"{idx+1}. {row.name}")
+        id = input("Type number: ").strip()
+        v_result[int(id)-1].delete()
+        print(f"{v_result[int(id)-1].name} was removed.")
+        input("Press Enter...")
 
 def car_question():
     car = input("Have a car (Y/N): ").strip().lower()
@@ -141,4 +146,4 @@ def city_question():
     
 def pretty_print(data) -> None:
     for row in data:
-        print(dict(row))
+        print(row)
