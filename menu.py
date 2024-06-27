@@ -4,7 +4,8 @@ from city import City
 from car import Car
 from volunteer_car import VolunteerCar
 # import Bussiness
-# import Animal
+from animal import Animal
+from volunteer_animal import VolunteerAnimal
 from language import Language
 from volunteer_language import VolunteerLanguage
 from database import select, insert
@@ -14,6 +15,7 @@ def add_volunteer() -> int:
     print("Please, type the following attributes.")
     print("If you don't want to fill some information leave a space (press Enter)")
     car = Car()
+    animal = Animal()
     volunteer = {
         'name': input("Name: ").strip(),
         'birth_date': input("Birth date (dd/mm/yyyy): ").strip(),
@@ -23,13 +25,15 @@ def add_volunteer() -> int:
         'has_driver_licence': car.driver_licence_question(),
         'has_car': car.car_question(),
         # 'has_bussiness': bussiness_question(),
-        # "love_animals": animal_question()
+        "love_animals": animal.animal_question()
     }
     v = Volunteer(volunteer)
     id = v.create()
     VolunteerLanguage.create(id, volunteer['language'])
     if car.id:
         VolunteerCar.create(id, car.id)
+    if animal.id:
+        VolunteerAnimal.create(id, animal.id)
 
 def show_all() -> None:
     result = Volunteer.get_all()
