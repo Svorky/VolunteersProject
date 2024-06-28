@@ -12,7 +12,8 @@ def menu():
             6. Exit.
             ''')
         user = input("What you want to do? ").strip()
-        
+        if user == '':
+            return None
         match int(user):
             case 1:
                 add_volunteer()

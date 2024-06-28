@@ -1,4 +1,4 @@
-# import VolunteersManager
+from find import Find
 from volunteer import Volunteer
 from city import City
 from car import Car
@@ -43,13 +43,31 @@ def find() -> Volunteer:
     print("Find by: ")
     print('''
           1. By name
-          2. By age
-          3. By language
-          4. By driving licence
-          5. By car
-          6. By animal
-          7. By bussiness
+          2. By language
+          3. By driving licence
+          4. By car
+          5. By animal
+          6. By city
           ''')
+    user = input().strip()
+    if user == '':
+        return None
+    match int(user):
+        case 1:
+            Find.by_name()
+        case 2:
+            Find.by_language()
+        case 3:
+            Find.by_driving_licence()
+        case 4:
+            Find.by_car()
+        case 5:
+            Find.by_animal()
+        case 6:
+            Find.by_city()
+        case _:
+            print("Wrong number.")
+
 
 def update():
     vol = input("Type a name of volunteer to update")
