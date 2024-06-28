@@ -3,6 +3,7 @@ from helpers import print_rows, pretty_print
 from language import Language
 from car import Car
 from animal import Animal
+from city import City
 
 
 class Find:
@@ -57,18 +58,18 @@ WHERE
         lan_id = data[int(choise)-1]["id"]
         query = f'''
         SELECT
-	volunteer.name AS volunteer,
-	language.name AS language,
-	city.name AS city,
-	volunteer.telephone
+        volunteer.name AS volunteer,
+        language.name AS language,
+        city.name AS city,
+        volunteer.telephone
 FROM
-	volunteer
-	INNER JOIN volunteer_language
-	 ON volunteer.id = volunteer_language.volunteer_id
-	INNER JOIN language
-	 ON volunteer_language.language_id = language.id
-	INNER JOIN city
-	 ON volunteer.city_id = city.id
+        volunteer
+        INNER JOIN volunteer_language
+         ON volunteer.id = volunteer_language.volunteer_id
+        INNER JOIN language
+         ON volunteer_language.language_id = language.id
+        INNER JOIN city
+         ON volunteer.city_id = city.id
 WHERE
         language.id = %s
         '''
@@ -117,7 +118,7 @@ WHERE
         vols = select(query, [car_id])
         pretty_print(vols)
         input("Press Enter to continue...")
-        
+
     @classmethod
     def by_animal(self):
         print("Choose a car:")
@@ -144,6 +145,44 @@ WHERE
 	volunteer_animal.animal_id = %s
         '''
         vols = select(query, [animal_id])
+        pretty_print(vols)
+        input("Press Enter to continue...")
+
+    @classmethod
+    def by_city(self):
+        print("Choose a car:")
+        data = City.get_all()
+        print_rows(data)
+        choise = input("Type a number: ").strip()
+        city_id = data[int(choise)-1]["id"]
+        query = '''
+        SELECT
+	volunteer.name AS volunteer,
+	city.name AS city,
+	volunteer.telephone,
+	language.name AS language,
+	car.name AS car,
+	animal.name AS animal
+FROM
+	city
+	INNER JOIN volunteer
+	 ON city.id = volunteer.city_id
+	LEFT OUTER JOIN volunteer_car
+	 ON volunteer.id = volunteer_car.volunteer_id
+	LEFT OUTER JOIN volunteer_animal
+	 ON volunteer.id = volunteer_animal.volunteer_id
+	LEFT OUTER JOIN volunteer_language
+	 ON volunteer.id = volunteer_language.volunteer_id
+	LEFT OUTER JOIN language
+	 ON volunteer_language.language_id = language.id
+	LEFT OUTER JOIN animal
+	 ON volunteer_animal.animal_id = animal.id
+	LEFT OUTER JOIN car
+	 ON volunteer_car.car_id = car.id
+WHERE
+	volunteer.city_id = %s
+        '''
+        vols = select(query, [city_id])
         pretty_print(vols)
         input("Press Enter to continue...")
 
