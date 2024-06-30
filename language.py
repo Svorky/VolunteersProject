@@ -19,3 +19,18 @@ class Language:
         query = "select id, name from language where name = %s"
         result = select(query, [name])
         return result
+    
+    @classmethod
+    def language_question(self):
+        print("Which languages do volunteer speaks:")
+        languages = self.get_all()
+        for [idx,row] in enumerate(languages):
+            s = f"{idx+1}. {row["name"]}"
+            print(s)
+        v_language = input("Choose an language or type a new one: ").strip()
+        if v_language.isdigit():
+            return languages[int(v_language)-1]['id']
+        else:
+            language = Language(v_language)
+            id = language.add()
+            return id

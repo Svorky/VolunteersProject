@@ -1,33 +1,33 @@
 from database import select, insert
 
+
 class Animal:
     def __init__(self) -> None:
         self.id = None
         self.name = ""
-    
+
     @classmethod
     def get_all(self):
         query = "select id, name from animal"
         result = select(query)
         return result
-    
+
     def add(self):
         query = 'insert into animal (name) values (%s)'
         id = insert(query, [self.name])
         return id
-    
+
     def select(name):
         query = "select id, name from animal where name = %s"
         result = select(query, [name])
         return result
-    
-        
-    def animal_question(self):
+
+    def question(self):
         u_animal = input("Can you feed animal (Y/N): ").strip().lower()
         if u_animal == 'y':
             print("What animal do you prefer to feed:")
             animals = self.get_all()
-            for [idx,row] in enumerate(animals):
+            for [idx, row] in enumerate(animals):
                 s = f"{idx+1}. {row["name"]}"
                 print(s)
             v_animal = input("Choose an animal or type a new one: ").strip()

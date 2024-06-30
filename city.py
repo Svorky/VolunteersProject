@@ -19,3 +19,18 @@ class City:
         query = "select id, name from city where name = %s"
         result = select(query, [name])
         return result
+    
+    @classmethod
+    def city_question(self):
+        cities = self.get_all()
+        print("Cities: ")
+        for [idx,row] in enumerate(cities):
+            s = f"{idx+1}. {row["name"]}"
+            print(s)
+        v_city = input("Choose city or write a new one: ").strip()
+        if v_city.isdigit():
+            return cities[int(v_city)-1]['id']
+        else:
+            city = City(v_city)
+            id = city.add()
+            return id
