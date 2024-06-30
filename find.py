@@ -93,11 +93,6 @@ WHERE
 
     @classmethod
     def by_car(self):
-        print("Choose a car:")
-        data = Car.get_all()
-        print_rows(data)
-        choise = input("Type a number: ").strip()
-        car_id = data[int(choise)-1]["id"]
         query = '''
         SELECT
 	volunteer.name AS volunteer,
@@ -112,20 +107,45 @@ FROM
 	 ON volunteer.id = volunteer_car.volunteer_id
 	INNER JOIN car
 	 ON volunteer_car.car_id = car.id
-WHERE
-	volunteer_car.car_id = %s
         '''
-        vols = select(query, [car_id])
-        pretty_print(vols)
-        input("Press Enter to continue...")
+        res = select(query)
+        pretty_print(res)
+        print()
+        want_car = input("Do you want to choose a car? (Y/N) ").strip().lower()
+        if want_car == 'y':
+            print("Choose a car:")
+            data = Car.get_all()
+            print_rows(data)
+            choise = input("Type a number: ").strip()
+            car_id = data[int(choise)-1]["id"]
+            query = '''
+            SELECT
+        volunteer.name AS volunteer,
+        car.name AS car,
+        city.name AS city,
+        volunteer.telephone
+    FROM
+        volunteer
+        INNER JOIN city
+        ON volunteer.city_id = city.id
+        INNER JOIN volunteer_car
+        ON volunteer.id = volunteer_car.volunteer_id
+        INNER JOIN car
+        ON volunteer_car.car_id = car.id
+    WHERE
+        volunteer_car.car_id = %s
+            '''
+            vols = select(query, [car_id])
+            if len(vols) == 0:
+                print("There is no data.")
+            else:
+                pretty_print(vols)
+            input("Press Enter to continue...")
+        else:
+            return None
 
     @classmethod
     def by_animal(self):
-        print("Choose a car:")
-        data = Animal.get_all()
-        print_rows(data)
-        choise = input("Type a number: ").strip()
-        animal_id = data[int(choise)-1]["id"]
         query = '''
         SELECT
 	volunteer.name AS volunteer,
@@ -141,12 +161,29 @@ FROM
 	 ON volunteer_animal.animal_id = animal.id
 	INNER JOIN city
 	 ON volunteer.city_id = city.id
-WHERE
-	volunteer_animal.animal_id = %s
         '''
-        vols = select(query, [animal_id])
-        pretty_print(vols)
-        input("Press Enter to continue...")
+        res = select(query)
+        pretty_print(res)
+        print()
+        want_animal = input("Do you want to choose an animal? (Y/N) ").strip().lower()
+        if want_animal == 'y':
+            print("Choose an animal:")
+            data = Animal.get_all()
+            print_rows(data)
+            choise = input("Type a number: ").strip()
+            animal_id = data[int(choise)-1]["id"]
+            query += '''
+    WHERE
+        volunteer_animal.animal_id = %s
+            '''
+            vols = select(query, [animal_id])
+            if len(vols) == 0:
+                print("There is no data.")
+            else:
+                pretty_print(vols)
+            input("Press Enter to continue...")
+        else:
+            return None
 
     @classmethod
     def by_city(self):
@@ -183,7 +220,10 @@ WHERE
 	volunteer.city_id = %s
         '''
         vols = select(query, [city_id])
-        pretty_print(vols)
+        if len(vols) == 0:
+            print("There is no data.")
+        else:
+            pretty_print(vols)
         input("Press Enter to continue...")
 
 # SELECT v.name as volunteer, l.name as language, car.name as car, city.name as city
