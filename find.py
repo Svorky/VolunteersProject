@@ -81,14 +81,19 @@ WHERE
     def by_driving_licence(self):
         query = '''
         SELECT
-	volunteer.name AS volunteer
+	volunteer.name AS volunteer,
+	city.name AS city,
+	volunteer.telephone
 FROM
 	volunteer
-WHERE
-	volunteer.has_driver_licence = true
+	INNER JOIN city
+	 ON volunteer.city_id = city.id
+	INNER JOIN volunteer_car
+	 ON volunteer.id = volunteer_car.volunteer_id
         '''
-        vols = select(query)
-        pretty_print(vols)
+        res = select(query)
+        pretty_print(res)
+        print()
         input("Press Enter to continue...")
 
     @classmethod
