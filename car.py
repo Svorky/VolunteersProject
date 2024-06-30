@@ -32,8 +32,8 @@ class Car:
         else:
             return None
         
-    def car_question(self):
-        if self.licence != True:
+    def car_question(self, check_licence = True):
+        if self.licence != True and check_licence:
             return None
         u_car = input("Have a car (Y/N): ").strip().lower()
         if u_car == 'y':

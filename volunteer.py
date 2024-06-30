@@ -30,10 +30,46 @@ class Volunteer:
         return result_list
 #{", ".join(list(self.__dict__.keys()))}
     @classmethod
-    def get_all(self) -> list[Self]:
-        data = select(f"select * from {self.table_name}")
-        return self.convert_to_self(data)
+    def get_all(self) -> list:
+        data = select(f'''
+                      SELECT
+	volunteer.id,
+	volunteer.name as volunteer_name,
+	volunteer.birth_date,
+	city.name as city,
+	volunteer.telephone,
+	language.name as language,
+	volunteer.has_driver_licence,
+	volunteer.has_car,
+	car.name as car,
+	volunteer.love_animals,
+	animal.name as animal
+FROM
+	city
+	INNER JOIN volunteer
+	 ON city.id = volunteer.city_id
+	LEFT OUTER JOIN volunteer_language
+	 ON volunteer.id = volunteer_language.volunteer_id
+	LEFT OUTER JOIN volunteer_car
+	 ON volunteer.id = volunteer_car.volunteer_id
+	LEFT OUTER JOIN volunteer_animal
+	 ON volunteer.id = volunteer_animal.volunteer_id
+	LEFT OUTER JOIN animal
+	 ON volunteer_animal.animal_id = animal.id
+	LEFT OUTER JOIN car
+	 ON volunteer_car.car_id = car.id
+	LEFT OUTER JOIN language
+	 ON volunteer_language.language_id = language.id
+ORDER BY
+	volunteer.id ASC
+                      ''')
+        return data
 
+    @classmethod
+    def get_by_id(self, id) -> Self:
+        data = select(f"select * from {self.table_name} where id = %s", [id])
+        return self.convert_to_self(data)
+        
     def create(self) -> int:
         volunteer = self.__dict__
         # keys = list(volunteer.keys())
