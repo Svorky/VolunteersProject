@@ -61,7 +61,7 @@ class Update:
     
     @classmethod
     def has_driver_licence(self,row):
-        print(f"Status of driving licenece is {row['has_driving_licence']}")
+        print(f"Status of driving licenece is {row['has_driver_licence']}")
         new_value = input("Type a new status (Y/N): ").strip()
         update("volunteer", "has_driver_licence", 'id', [new_value, row['id']])
         print("Record was updated.")
